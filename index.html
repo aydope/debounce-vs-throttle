@@ -1,0 +1,568 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta
+      name="description"
+      content="Interactive JavaScript playground for understanding Debounce and Throttle."
+    />
+
+    <meta name="author" content="Aydope" />
+
+    <title>Event Lab — Debounce vs Throttle</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="stylesheet" href="styles.css" />
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+
+  <body class="grid-bg min-h-screen">
+    <!-- Hero section -->
+
+    <header class="relative overflow-hidden">
+      <div class="max-w-6xl mx-auto px-6 pt-20 pb-16">
+        <div class="mb-5 text-sm text-blue-400 font-medium tracking-wide">
+          AYDOPE • JAVASCRIPT PLAYGROUND
+        </div>
+
+        <div class="max-w-4xl">
+          <div
+            class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass text-xs text-slate-400 mb-6"
+          >
+            <span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
+
+            Interactive Event Laboratory
+          </div>
+
+          <h1
+            class="text-5xl md:text-7xl font-bold tracking-tight text-white leading-tight"
+          >
+            Debounce
+
+            <span class="text-slate-600"> vs </span>
+
+            <span class="text-blue-400"> Throttle </span>
+          </h1>
+
+          <p
+            class="mt-6 text-lg md:text-xl text-slate-400 max-w-2xl leading-relaxed"
+          >
+            Two simple JavaScript techniques that can dramatically change how
+            often your application executes expensive operations.
+          </p>
+
+          <div class="flex flex-wrap gap-3 mt-8">
+            <a
+              href="#debounce"
+              class="px-5 py-3 rounded-xl bg-blue-500 hover:bg-blue-400 text-white font-medium transition"
+            >
+              Try Debounce
+            </a>
+
+            <a
+              href="#throttle"
+              class="px-5 py-3 rounded-xl glass hover:bg-slate-800 transition"
+            >
+              Try Throttle
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-6 pb-20">
+      <!-- Debounce experiment -->
+
+      <section id="debounce" class="mb-24">
+        <div
+          class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-5"
+        >
+          <div>
+            <div class="text-blue-400 text-sm font-semibold mb-2">
+              EXPERIMENT 01
+            </div>
+
+            <h2 class="text-3xl md:text-4xl font-bold text-white">
+              Search Control Room
+            </h2>
+
+            <p class="text-slate-400 mt-2 max-w-2xl">
+              Type quickly and watch how Debounce waits until the user stops
+              typing before executing the expensive operation.
+            </p>
+          </div>
+
+          <div class="px-4 py-2 rounded-xl glass text-sm text-slate-400">
+            Delay:
+
+            <span class="text-white font-semibold"> 500ms </span>
+          </div>
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-5">
+          <div class="lg:col-span-2 glass glow rounded-2xl p-6">
+            <label
+              for="searchInput"
+              class="block text-sm font-medium text-slate-300 mb-3"
+            >
+              Simulated Search
+            </label>
+
+            <div class="relative">
+              <input
+                id="searchInput"
+                type="text"
+                autocomplete="off"
+                placeholder="Try typing: javascript debounce..."
+                class="w-full px-5 py-4 rounded-xl bg-slate-950/80 border border-slate-800 focus:border-blue-400 focus:outline-none text-white transition"
+              />
+
+              <div
+                id="searchStatus"
+                class="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-500"
+              >
+                Waiting
+              </div>
+            </div>
+
+            <div class="grid sm:grid-cols-3 gap-3 mt-5">
+              <div
+                class="rounded-xl bg-slate-950/60 border border-slate-800 p-4"
+              >
+                <div class="text-xs text-slate-500">Keystroke Events</div>
+
+                <div id="keyCount" class="text-2xl font-bold text-white mt-1">
+                  0
+                </div>
+              </div>
+
+              <div
+                class="rounded-xl bg-slate-950/60 border border-slate-800 p-4"
+              >
+                <div class="text-xs text-slate-500">API Executions</div>
+
+                <div
+                  id="apiCount"
+                  class="text-2xl font-bold text-blue-400 mt-1"
+                >
+                  0
+                </div>
+              </div>
+
+              <div
+                class="rounded-xl bg-slate-950/60 border border-slate-800 p-4"
+              >
+                <div class="text-xs text-slate-500">Saved Executions</div>
+
+                <div
+                  id="savedCount"
+                  class="text-2xl font-bold text-emerald-400 mt-1"
+                >
+                  0%
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-6">
+              <div class="flex items-center justify-between mb-3">
+                <div class="text-sm text-slate-300">Event Timeline</div>
+
+                <button
+                  id="clearTimeline"
+                  class="text-xs text-slate-500 hover:text-white transition"
+                >
+                  Clear
+                </button>
+              </div>
+
+              <div
+                id="timeline"
+                class="timeline h-40 overflow-y-auto rounded-xl bg-slate-950/60 border border-slate-800 p-4 space-y-2"
+              >
+                <div class="text-xs text-slate-600">
+                  Start typing to generate events...
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="glass rounded-2xl p-6">
+            <div
+              class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-400/20 flex items-center justify-center text-blue-400 mb-5"
+            >
+              01
+            </div>
+
+            <h3 class="text-xl font-semibold text-white">Debounce</h3>
+
+            <p class="text-slate-400 text-sm leading-6 mt-3">
+              Debounce delays execution until events stop happening for a
+              specific amount of time.
+            </p>
+
+            <div
+              class="mt-6 p-4 rounded-xl bg-slate-950/70 border border-slate-800"
+            >
+              <div class="text-xs text-slate-500 mb-2">Mental Model</div>
+
+              <p class="text-sm text-slate-300 leading-6">
+                "Keep waiting...
+
+                <span class="text-blue-400"> now execute. </span>"
+              </p>
+            </div>
+
+            <div class="mt-5 space-y-3 text-sm">
+              <div class="flex gap-3">
+                <span class="text-blue-400"> → </span>
+
+                <span class="text-slate-400"> Search boxes </span>
+              </div>
+
+              <div class="flex gap-3">
+                <span class="text-blue-400"> → </span>
+
+                <span class="text-slate-400"> Autocomplete </span>
+              </div>
+
+              <div class="flex gap-3">
+                <span class="text-blue-400"> → </span>
+
+                <span class="text-slate-400"> Form validation </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Throttle experiment -->
+
+      <section id="throttle" class="mb-24">
+        <div
+          class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-5"
+        >
+          <div>
+            <div class="text-emerald-400 text-sm font-semibold mb-2">
+              EXPERIMENT 02
+            </div>
+
+            <h2 class="text-3xl md:text-4xl font-bold text-white">
+              Scroll Reactor
+            </h2>
+
+            <p class="text-slate-400 mt-2 max-w-2xl">
+              Scroll the page and watch Throttle limit how frequently your
+              handler executes.
+            </p>
+          </div>
+
+          <div class="px-4 py-2 rounded-xl glass text-sm text-slate-400">
+            Limit:
+
+            <span class="text-white font-semibold"> 100ms </span>
+          </div>
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-5">
+          <!-- Sticky reactor -->
+
+          <div class="lg:col-span-2">
+            <div
+              class="glass glow rounded-2xl p-6 sticky top-6 min-h-[430px] flex flex-col items-center justify-center"
+            >
+              <div class="absolute top-5 left-5 text-xs text-slate-600">
+                Window Scroll Monitor
+              </div>
+
+              <div class="reactor" id="reactor">
+                <div class="reactor-core"></div>
+              </div>
+
+              <div class="mt-8 text-center">
+                <div
+                  id="reactorStatus"
+                  class="text-lg font-semibold text-white"
+                >
+                  Reactor Stable
+                </div>
+
+                <div class="text-sm text-slate-500 mt-2">
+                  Scroll the entire page to generate events
+                </div>
+              </div>
+
+              <div class="grid sm:grid-cols-3 gap-3 mt-8 w-full">
+                <div
+                  class="rounded-xl bg-slate-950/60 border border-slate-800 p-4 text-center"
+                >
+                  <div class="text-xs text-slate-500">Raw Events</div>
+
+                  <div
+                    id="scrollRaw"
+                    class="text-2xl font-bold text-white mt-1"
+                  >
+                    0
+                  </div>
+                </div>
+
+                <div
+                  class="rounded-xl bg-slate-950/60 border border-slate-800 p-4 text-center"
+                >
+                  <div class="text-xs text-slate-500">Throttled</div>
+
+                  <div
+                    id="scrollThrottled"
+                    class="text-2xl font-bold text-emerald-400 mt-1"
+                  >
+                    0
+                  </div>
+                </div>
+
+                <div
+                  class="rounded-xl bg-slate-950/60 border border-slate-800 p-4 text-center"
+                >
+                  <div class="text-xs text-slate-500">Reduction</div>
+
+                  <div
+                    id="scrollReduction"
+                    class="text-2xl font-bold text-blue-400 mt-1"
+                  >
+                    0%
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Throttle explanation -->
+
+          <div class="glass rounded-2xl p-6 h-fit">
+            <div
+              class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-400/20 flex items-center justify-center text-emerald-400 mb-5"
+            >
+              02
+            </div>
+
+            <h3 class="text-xl font-semibold text-white">Throttle</h3>
+
+            <p class="text-slate-400 text-sm leading-6 mt-3">
+              Throttle allows a function to execute at most once within a
+              defined time interval.
+            </p>
+
+            <div
+              class="mt-6 p-4 rounded-xl bg-slate-950/70 border border-slate-800"
+            >
+              <div class="text-xs text-slate-500 mb-2">Mental Model</div>
+
+              <p class="text-sm text-slate-300 leading-6">
+                "Events can keep coming.
+
+                <span class="text-emerald-400">
+                  Execute at controlled intervals. </span
+                >"
+              </p>
+            </div>
+
+            <div class="mt-5 space-y-3 text-sm">
+              <div class="flex gap-3">
+                <span class="text-emerald-400"> → </span>
+
+                <span class="text-slate-400"> Scroll handlers </span>
+              </div>
+
+              <div class="flex gap-3">
+                <span class="text-emerald-400"> → </span>
+
+                <span class="text-slate-400"> Mouse movement </span>
+              </div>
+
+              <div class="flex gap-3">
+                <span class="text-emerald-400"> → </span>
+
+                <span class="text-slate-400"> Window resize </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Extra content creates enough page height
+           for the sticky demonstration -->
+
+        <div class="mt-8 grid md:grid-cols-3 gap-5">
+          <div class="glass rounded-2xl p-6 min-h-[220px]">
+            <div class="text-xs text-emerald-400 font-semibold mb-3">
+              EVENT STREAM
+            </div>
+
+            <div class="text-2xl font-bold text-white">Continuous</div>
+
+            <p class="text-sm text-slate-500 leading-6 mt-3">
+              Scroll events can fire many times while the user is moving through
+              the page.
+            </p>
+          </div>
+
+          <div class="glass rounded-2xl p-6 min-h-[220px]">
+            <div class="text-xs text-blue-400 font-semibold mb-3">
+              THROTTLE WINDOW
+            </div>
+
+            <div class="text-2xl font-bold text-white">100ms</div>
+
+            <p class="text-sm text-slate-500 leading-6 mt-3">
+              The handler is allowed to execute once during each 100ms interval.
+            </p>
+          </div>
+
+          <div class="glass rounded-2xl p-6 min-h-[220px]">
+            <div class="text-xs text-purple-400 font-semibold mb-3">RESULT</div>
+
+            <div class="text-2xl font-bold text-white">Fewer Executions</div>
+
+            <p class="text-sm text-slate-500 leading-6 mt-3">
+              The browser can receive many events without forcing your expensive
+              logic to run for every single event.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Comparison section -->
+
+      <section class="mb-20">
+        <div class="text-center mb-8">
+          <div class="text-slate-500 text-sm font-medium mb-2">
+            FINAL COMPARISON
+          </div>
+
+          <h2 class="text-3xl md:text-4xl font-bold text-white">
+            The Core Difference
+          </h2>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-5">
+          <div class="glass rounded-2xl p-6 border-l-2 border-blue-400">
+            <div class="flex items-center justify-between">
+              <h3 class="text-xl font-semibold text-white">Debounce</h3>
+
+              <span class="text-blue-400 text-sm"> Wait → Execute </span>
+            </div>
+
+            <p class="text-slate-400 mt-4 leading-7">
+              Best when you only care about the final event after a burst of
+              activity.
+            </p>
+
+            <div class="mt-5 text-sm text-slate-500">
+              Example:
+
+              <span class="text-slate-300">
+                User finishes typing → send request
+              </span>
+            </div>
+          </div>
+
+          <div class="glass rounded-2xl p-6 border-l-2 border-emerald-400">
+            <div class="flex items-center justify-between">
+              <h3 class="text-xl font-semibold text-white">Throttle</h3>
+
+              <span class="text-emerald-400 text-sm"> Control → Execute </span>
+            </div>
+
+            <p class="text-slate-400 mt-4 leading-7">
+              Best when events continuously happen but you still need controlled
+              periodic execution.
+            </p>
+
+            <div class="mt-5 text-sm text-slate-500">
+              Example:
+
+              <span class="text-slate-300">
+                User scrolls → update position periodically
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+
+    <footer class="border-t border-slate-800/80">
+      <div class="max-w-6xl mx-auto px-6 py-10">
+        <div
+          class="flex flex-col md:flex-row md:items-center md:justify-between gap-6"
+        >
+          <div>
+            <div class="text-white font-semibold text-lg">Aydope</div>
+
+            <div class="text-sm text-slate-500 mt-1">JavaScript Playground</div>
+          </div>
+
+          <div class="flex flex-wrap gap-3">
+            <a
+              href="https://github.com/aydope"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="px-4 py-2 rounded-lg glass text-sm text-slate-400 hover:text-white hover:border-slate-600 transition"
+            >
+              GitHub
+            </a>
+
+            <a
+              href="https://www.linkedin.com/in/mohammad-amin-sadeghi/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="px-4 py-2 rounded-lg glass text-sm text-slate-400 hover:text-white hover:border-slate-600 transition"
+            >
+              LinkedIn
+            </a>
+
+            <a
+              href="https://t.me/aydope"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="px-4 py-2 rounded-lg glass text-sm text-slate-400 hover:text-white hover:border-slate-600 transition"
+            >
+              Telegram
+            </a>
+
+            <a
+              href="https://instagram.com/aydope.r"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="px-4 py-2 rounded-lg glass text-sm text-slate-400 hover:text-white hover:border-slate-600 transition"
+            >
+              Instagram
+            </a>
+          </div>
+        </div>
+
+        <div
+          class="mt-8 pt-6 border-t border-slate-800/60 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs text-slate-600"
+        >
+          <div>© 2026 Aydope. All rights reserved.</div>
+
+          <div>Built with HTML, CSS, JavaScript & Tailwind CSS</div>
+        </div>
+      </div>
+    </footer>
+    <script src="src/main.js"></script>
+  </body>
+</html>
